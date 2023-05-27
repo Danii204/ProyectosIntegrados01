@@ -1,4 +1,4 @@
-# Proyectos01
+# Proyectos Integrados 01
 Este repositorio recopila todas las actividades de Daniel Acevedo Facal para la asignatura de Proyectos Integrados 1 de la Carrera de Robótica impartida en la USC.
 
 
