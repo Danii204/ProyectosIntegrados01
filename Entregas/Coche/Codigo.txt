@@ -1,0 +1,151 @@
+const int ECHO[2] = {50, 48};
+
+const int TRIGGER[2] = {52, 46};
+
+const int MOTOR_D[2] = {7, 6};
+
+const int MOTOR_I[2] = {5, 4};
+
+const int POTENCIA[2] = {2, 3};
+
+//LiquidCrystal lcd(A2, A3, 7, 6, 5, 4);
+
+int Et = 0;
+
+
+
+void setup() {
+
+  Serial.begin(9600);
+
+  //lcd.begin(16, 2);
+
+  for (int i = 0; i < 2; i++)
+
+  {
+
+    pinMode(ECHO[i],INPUT);
+
+    pinMode(TRIGGER[i],OUTPUT);
+
+    pinMode(MOTOR_D[i],OUTPUT);
+
+    pinMode(MOTOR_I[i],OUTPUT);
+    
+    pinMode(POTENCIA[i],OUTPUT);
+    
+    digitalWrite(POTENCIA[i], HIGH);
+
+  }
+
+}
+
+
+
+//DETECCION DE DISTANCIA
+
+int DETECION_SENSOR(int sensor){
+
+  digitalWrite(TRIGGER[sensor], LOW);
+
+  delayMicroseconds(5);
+
+  digitalWrite(TRIGGER[sensor], HIGH);
+
+  delayMicroseconds(15);
+
+  digitalWrite(TRIGGER[sensor], LOW);
+
+
+
+  int tiempo = pulseIn(ECHO[sensor], HIGH);
+
+  int distancia = tiempo / 58;
+  
+  Serial.print(distancia);
+
+  return (distancia);
+
+}
+
+
+
+
+
+//Representacion de informacion en el display
+
+/*void LCD_INFO(int sensor, int distancia){
+
+  lcd.clear();
+
+  lcd.print("DETECCION MIN S");
+
+  lcd.print(sensor);
+
+  lcd.setCursor(0,1);
+
+  lcd.print(distancia);
+
+  lcd.print(" cm");
+
+}
+
+*/
+
+void loop() {
+
+  Serial.print(Et);
+
+  switch (Et)
+
+  {
+
+  case 0: //voy hacia adelante
+      digitalWrite(MOTOR_D[0], HIGH);
+
+      digitalWrite(MOTOR_I[0], HIGH);
+
+      Et = 1;
+
+    break;
+
+  case 1: // si detecto algo, paro y hago secuencia de movimientos
+  
+    if(DETECION_SENSOR(int sensor) < 50)
+
+    digitalWrite(MOTOR_D[0], LOW); //Paro
+
+    digitalWrite(MOTOR_I[0], LOW);
+
+    delay(100);
+    
+    digitalWrite(MOTOR_D[1], HIGH); //Hacia detras
+
+    digitalWrite(MOTOR_I[1], HIGH);
+    
+    delay(1000);
+    
+    digitalWrite(MOTOR_D[1], LOW); //Paro mov atras
+
+    digitalWrite(MOTOR_I[1], LOW);
+
+    delay(100);
+    
+    digitalWrite(MOTOR_D[0], HIGH); //Hacia la derecha
+
+    digitalWrite(MOTOR_I[1], HIGH);
+
+    delay(2000);
+    
+    digitalWrite(MOTOR_D[0], LOW); //Paro mov derecha
+
+    digitalWrite(MOTOR_I[1], LOW);
+
+    delay(100);
+
+    Et = 0;
+
+    break;
+  }
+
+}
