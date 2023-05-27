@@ -1,0 +1,27 @@
+// Incluir la librería del servo
+#include <Servo.h>
+
+// Crear un objeto del tipo Servo
+Servo miServo;
+
+// Definir el pin del servo
+int servoPin = 2;
+
+void setup() {
+  // Inicializar el objeto del servo
+  miServo.attach(servoPin);
+
+  // Configurar la comunicación serial
+  Serial.begin(9600);
+}
+
+void loop() {
+  for (int i = 0; i<=180; i++){
+    miServo.write(i);
+    delay(10);
+  }
+    for (int j = 180; j>=0; j--){
+    miServo.write(j);
+    delay(10);
+  }
+}

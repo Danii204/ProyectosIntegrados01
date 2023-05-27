@@ -1,0 +1,32 @@
+// Definir los pines del sensor de sonido y el LED
+int sensorPin = A0;
+int ledPin = 12;
+
+// Definir una variable para almacenar el valor del sensor
+int sensorValue = 0;
+
+void setup() {
+  // Inicializar el pin LED como salida
+  pinMode(ledPin, OUTPUT);
+  
+  // Inicializar la comunicación serial
+  Serial.begin(9600);
+}
+
+void loop() {
+  // Leer el valor del sensor de sonido
+  sensorValue = analogRead(sensorPin);
+  
+  // Mostrar el valor en la consola serial
+  Serial.println(sensorValue);
+  
+  // Si el valor es mayor a 500, encender el LED
+  if (sensorValue > 500) {
+    digitalWrite(ledPin, HIGH);
+  } else {
+    digitalWrite(ledPin, LOW);
+  }
+  
+  // Esperar 100 ms antes de volver a leer el sensor
+  delay(100);
+}
