@@ -21,3 +21,5 @@ Este repositorio recopila todas las actividades de Daniel Acevedo Facal para la 
 
 ## Información
 Todas estas actividades están entregadas en plazo y son los mismos documentos que los entregados por el aula virtual. 
+
+Las practicas de montaje se comparten con Luis Comesaña.
