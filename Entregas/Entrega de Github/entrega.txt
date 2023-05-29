@@ -1,0 +1,1 @@
+Creo que la creación de este propio github con todo los archivos y detalles que contienen verifica el conocimiento de git y github por mi parte.
