@@ -1,0 +1,196 @@
+// Arduino A
+const int trigPin1 = 8; 
+const int echoPin1 = 9;
+
+long duration;
+int distance;
+
+const int trigPin2 = 10; 
+const int echoPin2 = 11;
+
+long duration2;
+int distance2;
+
+int pwm, input; 
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(trigPin1, OUTPUT); 
+  pinMode(echoPin1, INPUT); 
+  pinMode(trigPin2, OUTPUT); 
+  pinMode(echoPin2, INPUT); 
+  pwm = 0;
+}
+
+void loop() {
+  // Sensor 1
+  digitalWrite(trigPin1, LOW); 
+  delayMicroseconds(2);
+  digitalWrite(trigPin1, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin1, LOW);
+  duration = pulseIn(echoPin1, HIGH);
+  distance = (duration/2) / 29.1;
+
+  // Sensor 2
+  digitalWrite(trigPin2, LOW); 
+  delayMicroseconds(2);
+  digitalWrite(trigPin2, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin2, LOW);
+  duration2 = pulseIn(echoPin2, HIGH);
+  distance2 = (duration2/2) / 29.1;
+
+  //Comparar si la distancia es menor a 50cm
+  if (distance < 50 || distance2 < 50) {
+    pwm = 255;
+  } else {
+    pwm = 0;
+  }
+  
+  // Enviar la señal por el pin A0
+  analogWrite(3, pwm);
+  
+  Serial.println(distance);
+  Serial.println(distance2);
+  
+  input = analogRead(A0);
+  Serial.println(input);
+  if (input == 1){
+    exit(0);
+  }
+
+  	
+  delay(200);
+}
+
+// Arduino B
+const int ledPin = 13;
+
+int input, pwm;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(ledPin, OUTPUT);
+  pwm = 0;
+}
+
+void loop() {
+  input = analogRead(A0);
+  Serial.println(input);
+  
+  // Si la señal recibida es mayor a 0 encender el led
+  if (input > 0) {
+    digitalWrite(ledPin, HIGH);
+    pwm = 1;
+    analogWrite(3, pwm);
+    Serial.println(pwm);
+  } else {
+    digitalWrite(ledPin, LOW);
+  }
+  
+  delay(200);
+}
+
+----------------------------------------------------------------------------------------------
+
+// Arduino A
+//DEFINICION I/O
+const int ECHO = 3;
+const int TRIGGER = 2;
+const int O_PWM = 5;
+const int I_ANALOG = A0;
+const int LED = 4;
+int num, val_trans;
+unsigned long duracion;
+double dutycycle;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(O_PWM,OUTPUT);
+  pinMode(LED,OUTPUT);
+  pinMode(I_ANALOG,INPUT);
+  pinMode(ECHO,INPUT);
+  pinMode(TRIGGER,OUTPUT);
+}
+
+//DETECCION DE DISTANCIA
+int DETECION_SENSOR(){
+  digitalWrite(TRIGGER, LOW);
+  delayMicroseconds(5);
+  digitalWrite(TRIGGER, HIGH);
+  delayMicroseconds(15);
+  digitalWrite(TRIGGER, LOW);
+
+  int tiempo = pulseIn(ECHO, HIGH);
+  int distancia = tiempo / 58;
+
+  return (distancia);
+}
+
+void loop(){
+  //Envio
+  num = DETECION_SENSOR();
+  val_trans = ((num/336.0)*255);
+  analogWrite(O_PWM, val_trans);
+  
+  //Recepcion
+  duracion = pulseIn(I_ANALOG, HIGH);
+  dutycycle = ((duracion/2145.0)*255);
+  Serial.println(dutycycle);
+
+  if ((int)dutycycle <= 50)
+  {
+    digitalWrite(LED, HIGH);
+  }else
+  {
+    digitalWrite(LED, LOW);
+  }
+  
+  delay(1000);
+}
+
+// Arduino B
+//DEFINICION I/O
+const int ECHO = 3;
+const int TRIGGER = 2;
+const int O_PWM = 5; 
+const int I_ANALOG = A0;
+int valorRec, dutycycle, val_trans, distancia;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(I_ANALOG, INPUT);
+  pinMode(ECHO,INPUT);
+  pinMode(TRIGGER,OUTPUT);
+}
+
+int DETECION_SENSOR(){
+  digitalWrite(TRIGGER, LOW);
+  delayMicroseconds(5);
+  digitalWrite(TRIGGER, HIGH);
+  delayMicroseconds(15);
+  digitalWrite(TRIGGER, LOW);
+
+  int tiempo = pulseIn(ECHO, HIGH);
+  int distancia = tiempo / 58;
+
+  return (distancia);
+}
+
+void loop() {
+  distancia = DETECION_SENSOR();
+  valorRec=analogRead(I_ANALOG);
+  dutycycle=((valorRec/1022.0)*255);
+  val_trans=round((dutycycle/255.0)*336);
+  
+  if (val_trans < distancia)
+  {
+    analogWrite(O_PWM, 77);
+  }else
+  {
+    analogWrite(O_PWM, 125);
+  }
+
+  delay(1000);
+}

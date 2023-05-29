@@ -1,0 +1,80 @@
+#!/usr/bin/env python
+
+import rospy
+import numpy as np 
+from geometry_msgs.msg import Twist
+from sensor_msgs.msg import LaserScan
+
+range_ahead=10
+range_left=10
+range_right=10
+
+def scan_callback(msg):
+    global range_ahead
+    global range_left
+    global range_right
+
+    #float32 angle_min  , start angle of the scan [rad]
+    #float32 angle_max   , end angle of the scan [rad]
+    # with zero angle being forward along the x axis
+    
+    #Podemos ver las caracteristicas de barrido....
+    #rospy.loginfo("angle min %f",msg.angle_min)
+    #rospy.loginfo("angle max %f",msg.angle_max)
+    #rospy.loginfo("angle_increment %f",msg.angle_increment)  # angular distance between measurements [rad]
+    
+    #anglemin=np.rad2deg(msg.angle_min)
+    #anglemax=np.rad2deg(msg.angle_max)
+    #angleincrement=np.rad2deg(msg.angle_increment)
+    #rospy.loginfo ("deg min %f",anglemin)
+    #rospy.loginfo ("deg max %f",anglemax)
+    #rospy.loginfo("deg increment %f",angleincrement)
+
+    #Podemos ver los valores devueltos por el escaner laser
+    #for i in range (0,len(msg.ranges),1):
+    #    currentangle=anglemin+i*angleincrement
+    #    rospy.loginfo ("i %d current angle %f distance %f",i,currentangle,msg.ranges[i])
+
+    #coge haz laser hacia la mitad del array...
+    range_ahead=msg.ranges[len(msg.ranges)/2]
+    range_left=msg.ranges[len(msg.ranges)/18]
+    range_right=msg.ranges[len(msg.ranges)*17/18]
+    #rospy.loginfo(range_ahead)
+
+
+def scan_and_move():
+    rospy.init_node ('movedor_robot')
+    pub=rospy.Publisher('/cmd_vel',Twist,queue_size=1)
+    scan_sub=rospy.Subscriber('/kobuki/laser/scan',LaserScan,scan_callback)
+    rate=rospy.Rate(4)
+    move=Twist()
+    #print ("distancia delante ",range_ahead)
+    
+    while not rospy.is_shutdown():
+        print ("distancia delante ",range_ahead)
+        if (range_left<range_right):
+            move.linear.x=0.2
+            move.angular.z=-0.5
+        elif (range_left>range_right):
+            move.linear.x=0.2
+            move.angular.z=0.5
+        elif (range_ahead>1): #se mueve hasta que detecta algo cerca
+            move.linear.x=0.5
+            move.angular.z=0.0
+        else:
+            move.linear.x=0.0
+            move.angular.z=-0.5
+             
+        pub.publish(move)
+
+        rate.sleep()
+
+        
+
+
+if __name__ == '__main__':
+	
+    try:
+        scan_and_move()
+    except rospy.ROSInterruptException:
+        rospy.loginfo("node terminated. ")

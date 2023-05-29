@@ -1,0 +1,34 @@
+// Definir los pines del encoder
+const int encoderPinA = 2;
+const int encoderPinB = 3;
+
+// Variable para almacenar el valor del encoder
+int encoderPos = 0;
+
+void setup() {
+  // Configurar los pines del encoder como entradas
+  pinMode(encoderPinA, INPUT);
+  pinMode(encoderPinB, INPUT);
+
+  // Iniciar comunicación serial a 9600 bps
+  Serial.begin(9600);
+}
+
+void loop() {
+  // Leer el estado de los pines del encoder
+  int encoderPinAState = digitalRead(encoderPinA);
+  int encoderPinBState = digitalRead(encoderPinB);
+
+  // Verificar el movimiento del encoder
+  if (encoderPinAState != encoderPinBState) {
+    encoderPos++;
+  } else {
+    encoderPos--;
+  }
+
+  // Mostrar el valor del encoder por el terminal
+  Serial.println(encoderPos);
+
+  // Opcional: Agregar un retardo para evitar la sobrecarga del monitor serial
+  delay(100);
+}
